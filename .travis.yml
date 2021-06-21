@@ -2,13 +2,14 @@ language: shell
 dist: bionic
 sudo: enabled
 os: linux
+virt: vm
 arch:
   - arm64-graviton2
 #  - amd64
 
 env:
   global:
-    - SNAPCRAFT_BUILD_ENVIRONMENT=lxd
+  #  - SNAPCRAFT_BUILD_ENVIRONMENT=lxd
 addons:
   snaps:
     - name: snapcraft
@@ -18,15 +19,16 @@ addons:
 
 install:
     # Remove deb package lxd
-  - sudo apt-get remove lxd-client lxc -y
-  - sudo apt-get autoremove
-  - sudo /snap/bin/lxd init --auto
-  - sudo usermod --append --groups lxd $USER
+  #- sudo apt-get remove lxd-client lxc -y
+  #- sudo apt-get autoremove
+  #- sudo /snap/bin/lxd init --auto
+  #- sudo usermod --append --groups lxd $USER
 
 script:
-  - sg lxd 'snapcraft'
+  - snapcraft --destructive-mode
+  #- sg lxd 'snapcraft'
 after_failure:
-  - sudo journalctl -u snapd
+  #- sudo journalctl -u snapd
 deploy:
   - provider: snap
     snap: ci*.snap
