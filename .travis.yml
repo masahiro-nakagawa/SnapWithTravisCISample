@@ -1,0 +1,36 @@
+language: shell
+dist: bionic
+sudo: enabled
+os: linux
+arch:
+  - arm64-graviton2
+#  - amd64
+
+env:
+  global:
+    - SNAPCRAFT_BUILD_ENVIRONMENT=lxd
+addons:
+  snaps:
+    - name: snapcraft
+      channel: stable
+      confinement: classic
+    - name: lxd
+
+install:
+    # Remove deb package lxd
+  - sudo apt-get remove lxd-client lxc -y
+  - sudo apt-get autoremove
+  - sudo /snap/bin/lxd init --auto
+  - sudo usermod --append --groups lxd $USER
+
+script:
+  - sg lxd 'snapcraft'
+after_failure:
+  - sudo journalctl -u snapd
+deploy:
+  - provider: snap
+    snap: ci*.snap
+    channel: edge
+    skip_cleanup: true
+    on:
+      all_branches: true
